@@ -1,0 +1,9 @@
+[
+  {"nombre": "Laptop", "precio": 999.99, "cantidad": 10},
+  {"nombre": "Smartphone", "precio": 499.50, "cantidad": 15},
+  {"nombre": "Auriculares", "precio": 79.99, "cantidad": 30},
+  {"nombre": "Tableta", "precio": 299.99, "cantidad": 8},
+  {"nombre": "Teclado", "precio": 49.99, "cantidad": 3},
+  {"nombre": "Mouse", "precio": 25.50, "cantidad": 20},
+  {"nombre": "Monitor", "precio": 199.99, "cantidad": 2}
+]

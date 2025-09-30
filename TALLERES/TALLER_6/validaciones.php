@@ -1,4 +1,3 @@
-
 <?php
 function validarNombre($nombre) {
     return !empty($nombre) && strlen($nombre) <= 50;
@@ -8,8 +7,21 @@ function validarEmail($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
-function validarEdad($edad) {
-    return is_numeric($edad) && $edad >= 18 && $edad <= 120;
+function validarFechaNacimiento($fecha) {
+    if (empty($fecha)) return false;
+    
+    // Calcular edad
+    $fechaNacimiento = new DateTime($fecha);
+    $hoy = new DateTime();
+    $edad = $hoy->diff($fechaNacimiento)->y;
+    
+    return $edad >= 18 && $edad <= 120;
+}
+
+function calcularEdad($fechaNacimiento) {
+    $fechaNac = new DateTime($fechaNacimiento);
+    $hoy = new DateTime();
+    return $hoy->diff($fechaNac)->y;
 }
 
 function validarSitioWeb($sitioWeb) {
@@ -22,8 +34,15 @@ function validarGenero($genero) {
 }
 
 function validarIntereses($intereses) {
+    if (empty($intereses)) return false;
+    
     $interesesValidos = ['deportes', 'musica', 'lectura'];
-    return !empty($intereses) && count(array_intersect($intereses, $interesesValidos)) === count($intereses);
+    foreach ($intereses as $interes) {
+        if (!in_array($interes, $interesesValidos)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 function validarComentarios($comentarios) {
@@ -48,5 +67,10 @@ function validarFotoPerfil($archivo) {
 
     return true;
 }
+
+function generarNombreUnico($nombreOriginal) {
+    $extension = pathinfo($nombreOriginal, PATHINFO_EXTENSION);
+    $nombreBase = pathinfo($nombreOriginal, PATHINFO_FILENAME);
+    return $nombreBase . '_' . time() . '.' . $extension;
+}
 ?>
-        

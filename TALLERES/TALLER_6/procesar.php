@@ -1,14 +1,18 @@
-
 <?php
 require_once 'validaciones.php';
 require_once 'sanitizacion.php';
+
+// Crear directorios si no existen
+if (!file_exists('uploads')) mkdir('uploads');
+if (!file_exists('data')) mkdir('data');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $errores = [];
     $datos = [];
 
-    // Procesar y validar cada campo
-    $campos = ['nombre', 'email', 'edad', 'sitio_web', 'genero', 'intereses', 'comentarios'];
+    // Campos a procesar
+    $campos = ['nombre', 'email', 'fecha_nacimiento', 'sitio_web', 'genero', 'intereses', 'comentarios'];
+    
     foreach ($campos as $campo) {
         if (isset($_POST[$campo])) {
             $valor = $_POST[$campo];
@@ -21,12 +25,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
+    // Calcular edad automáticamente
+    if (isset($datos['fecha_nacimiento'])) {
+        $datos['edad'] = calcularEdad($datos['fecha_nacimiento']);
+    }
+
     // Procesar la foto de perfil
     if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] !== UPLOAD_ERR_NO_FILE) {
         if (!validarFotoPerfil($_FILES['foto_perfil'])) {
             $errores[] = "La foto de perfil no es válida.";
         } else {
-            $rutaDestino = 'uploads/' . basename($_FILES['foto_perfil']['name']);
+            // Generar nombre único
+            $nombreUnico = generarNombreUnico($_FILES['foto_perfil']['name']);
+            $rutaDestino = 'uploads/' . $nombreUnico;
+            
             if (move_uploaded_file($_FILES['foto_perfil']['tmp_name'], $rutaDestino)) {
                 $datos['foto_perfil'] = $rutaDestino;
             } else {
@@ -35,25 +47,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Mostrar resultados o errores
+    // Guardar en JSON si no hay errores
+    if (empty($errores)) {
+        guardarEnJSON($datos);
+    }
+
+    // Mostrar resultados
     if (empty($errores)) {
         echo "<h2>Datos Recibidos:</h2>";
+        echo "<table border='1'>";
         foreach ($datos as $campo => $valor) {
+            echo "<tr>";
+            echo "<th>" . ucfirst($campo) . "</th>";
             if ($campo === 'intereses') {
-                echo "$campo: " . implode(", ", $valor) . "<br>";
+                echo "<td>" . implode(", ", $valor) . "</td>";
             } elseif ($campo === 'foto_perfil') {
-                echo "$campo: <img src='$valor' width='100'><br>";
+                echo "<td><img src='$valor' width='100'></td>";
             } else {
-                echo "$campo: $valor<br>";
+                echo "<td>$valor</td>";
             }
+            echo "</tr>";
         }
+        echo "</table>";
     } else {
         echo "<h2>Errores:</h2>";
+        echo "<ul>";
         foreach ($errores as $error) {
-            echo "$error<br>";
+            echo "<li>$error</li>";
         }
+        echo "</ul>";
     }
-} else {
-    echo "Acceso no permitido.";
+
+    echo "<br><a href='formulario.html'>Volver al formulario</a>";
+    echo "<br><a href='resumen.php'>Ver Resumen de Registros</a>";
+}
+
+function guardarEnJSON($datos) {
+    $archivo = 'data/registros.json';
+    $registros = [];
+    
+    if (file_exists($archivo)) {
+        $contenido = file_get_contents($archivo);
+        $registros = json_decode($contenido, true) ?: [];
+    }
+    
+    // Agregar fecha de registro
+    $datos['fecha_registro'] = date('Y-m-d H:i:s');
+    
+    $registros[] = $datos;
+    file_put_contents($archivo, json_encode($registros, JSON_PRETTY_PRINT));
 }
 ?>

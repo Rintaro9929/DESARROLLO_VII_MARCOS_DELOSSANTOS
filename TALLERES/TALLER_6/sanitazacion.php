@@ -1,15 +1,14 @@
-
 <?php
 function sanitizarNombre($nombre) {
-    return filter_var(trim($nombre), FILTER_SANITIZE_STRING);
+    return htmlspecialchars(trim($nombre));
 }
 
 function sanitizarEmail($email) {
     return filter_var(trim($email), FILTER_SANITIZE_EMAIL);
 }
 
-function sanitizarEdad($edad) {
-    return filter_var($edad, FILTER_SANITIZE_NUMBER_INT);
+function sanitizarFechaNacimiento($fecha) {
+    return trim($fecha);
 }
 
 function sanitizarSitioWeb($sitioWeb) {
@@ -17,17 +16,18 @@ function sanitizarSitioWeb($sitioWeb) {
 }
 
 function sanitizarGenero($genero) {
-    return filter_var(trim($genero), FILTER_SANITIZE_STRING);
+    return htmlspecialchars(trim($genero));
 }
 
 function sanitizarIntereses($intereses) {
-    return array_map(function($interes) {
-        return filter_var(trim($interes), FILTER_SANITIZE_STRING);
-    }, $intereses);
+    $sanitizados = [];
+    foreach ($intereses as $interes) {
+        $sanitizados[] = htmlspecialchars(trim($interes));
+    }
+    return $sanitizados;
 }
 
 function sanitizarComentarios($comentarios) {
-    return htmlspecialchars(trim($comentarios), ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars(trim($comentarios));
 }
 ?>
-        

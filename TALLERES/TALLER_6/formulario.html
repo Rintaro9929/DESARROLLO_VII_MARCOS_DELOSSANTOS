@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,14 +8,15 @@
 <body>
     <h2>Formulario de Registro Avanzado</h2>
     <form action="procesar.php" method="POST" enctype="multipart/form-data">
+        
         <label for="nombre">Nombre:</label>
         <input type="text" id="nombre" name="nombre" required><br><br>
 
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required><br><br>
 
-        <label for="edad">Edad:</label>
-        <input type="number" id="edad" name="edad" required><br><br>
+        <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
+        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required><br><br>
 
         <label for="sitio_web">Sitio Web:</label>
         <input type="url" id="sitio_web" name="sitio_web"><br><br>
@@ -45,5 +45,8 @@
         <input type="submit" value="Enviar">
         <input type="reset" value="Limpiar">
     </form>
+    
+    <br>
+    <a href="resumen.php">Ver Resumen de Registros</a>
 </body>
 </html>

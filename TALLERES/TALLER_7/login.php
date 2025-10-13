@@ -1,6 +1,13 @@
 
 <?php
+include 'config_sesion.php';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("Error de validación CSRF");
+    }
 session_start();
+
 
 // Si ya hay una sesión activa, redirigir al panel
 if(isset($_SESSION['usuario'])) {
@@ -36,6 +43,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($error)) {
         echo "<p style='color: red;'>$error</p>";
     }
+    // Generar token CSRF
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+?>
+
     ?>
     <form method="post" action="">
         <label for="usuario">Usuario:</label><br>
@@ -44,5 +55,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="password" id="contrasena" name="contrasena" required><br><br>
         <input type="submit" value="Iniciar Sesión">
     </form>
+    <!-- En el formulario HTML -->
+<form method="post" action="">
+    <!-- ... otros campos ... -->
+    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+    <input type="submit" value="Iniciar Sesión">
+</form>
 </body>
 </html>

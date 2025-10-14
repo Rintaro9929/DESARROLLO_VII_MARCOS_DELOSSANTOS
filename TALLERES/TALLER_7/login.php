@@ -1,13 +1,24 @@
-
 <?php
-include 'config_sesion.php';
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        die("Error de validación CSRF");
-    }
 session_start();
 
+error_reporting(0); // Ocultar errores en producción
+ini_set('display_errors', 0);
+
+// Función simple para mensajes de error
+function mostrarError($mensaje) {
+    $_SESSION['error'] = $mensaje;
+    header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? 'productos.php'));
+    exit;
+}
+
+// Función simple para mensajes de éxito
+function mostrarExito($mensaje) {
+    $_SESSION['exito'] = $mensaje;
+    header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? 'productos.php'));
+    exit;
+}
+
+include 'config_sesion.php';
 
 // Si ya hay una sesión activa, redirigir al panel
 if(isset($_SESSION['usuario'])) {
@@ -15,11 +26,21 @@ if(isset($_SESSION['usuario'])) {
     exit();
 }
 
+// Generar token CSRF ANTES de cualquier output
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Procesar el formulario cuando se envía
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $usuario = $_POST['usuario'];
     $contrasena = $_POST['contrasena'];
-
+    
+    // Validar token CSRF
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("Error de validación CSRF");
+    }
+    
     // En un caso real, verificaríamos contra una base de datos
     if($usuario === "admin" && $contrasena === "1234") {
         $_SESSION['usuario'] = $usuario;
@@ -43,10 +64,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($error)) {
         echo "<p style='color: red;'>$error</p>";
     }
-    // Generar token CSRF
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-?>
-
     ?>
     <form method="post" action="">
         <label for="usuario">Usuario:</label><br>
@@ -54,12 +71,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         <label for="contrasena">Contraseña:</label><br>
         <input type="password" id="contrasena" name="contrasena" required><br><br>
         <input type="submit" value="Iniciar Sesión">
+        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
     </form>
-    <!-- En el formulario HTML -->
-<form method="post" action="">
-    <!-- ... otros campos ... -->
-    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-    <input type="submit" value="Iniciar Sesión">
-</form>
 </body>
 </html>

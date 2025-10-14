@@ -73,12 +73,7 @@ $total = 0;
 <head>
     <meta charset="UTF-8">
     <title>Carrito de Compras</title>
-    <style>
-        table { border-collapse: collapse; width: 60%; margin: 20px auto; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-        th { background: #eee; }
-        .acciones { color: red; text-decoration: none; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h2>Carrito de Compras</h2>

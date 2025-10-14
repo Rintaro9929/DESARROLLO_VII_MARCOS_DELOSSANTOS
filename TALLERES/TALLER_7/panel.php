@@ -14,6 +14,7 @@ if(!isset($_SESSION['usuario'])) {
 <head>
     <meta charset="UTF-8">
     <title>Panel de Usuario</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h2>Bienvenido, <?php echo htmlspecialchars($_SESSION['usuario']); ?>!</h2>

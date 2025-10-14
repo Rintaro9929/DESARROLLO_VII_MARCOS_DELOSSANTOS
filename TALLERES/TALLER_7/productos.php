@@ -56,12 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['producto_id'])) {
 <head>
     <meta charset="UTF-8">
     <title>Productos</title>
-    <style>
-        table { border-collapse: collapse; width: 50%; margin: 20px auto; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-        form { margin: 0; }
-        .carrito-link { margin: 20px auto; display: block; width: 50%; text-align: right; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h2 style="text-align:center;">Lista de Productos</h2>

@@ -29,6 +29,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // 3. Multiplicación
     $multiplicacion = $numero1 * $numero2;
 
+    echo "<h3>Valores ingresados:</h3>";
+    echo "Número 1: $numero1 <br>";
+    echo "Número 2: $numero2 <br><br>";
+
     echo "<h3>Resultados:</h3>";
     echo "Suma: $suma <br>";
     echo "Resta: $resta <br>";

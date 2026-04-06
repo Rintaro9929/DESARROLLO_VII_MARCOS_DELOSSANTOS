@@ -8,10 +8,14 @@
 <body>
 
 <div class="container">
-    <h1>Laboratorio PHP</h1>
+    <h1>Trabajos PHP</h1>
 
     <ul>
         <li><a href="Trabajos/practica1.php">Práctica 1</a></li>
+    </ul>
+
+     <ul>
+        <li><a href="Laboratorio/Laboratorio1/laboratorio.php">Laboratorio #1</a></li>
     </ul>
 </div>
 

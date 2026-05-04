@@ -1,0 +1,9 @@
+{
+  "name": "lab4-ds7/autoload-psr4",
+  "description": "Implementación de PSR-4 con Composer",
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  }
+}

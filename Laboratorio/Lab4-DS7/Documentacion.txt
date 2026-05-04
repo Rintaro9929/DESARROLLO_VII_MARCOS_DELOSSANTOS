@@ -1,0 +1,253 @@
+# Laboratorio 4 – Implementación de Autoload con PSR-4 usando Composer
+
+## 👨‍💻 Datos del estudiante
+
+**Nombre:** Marcos De Los Santos
+**Materia:** Desarrollo de Software VII
+**Laboratorio:** Lab4
+**Tema:** Implementación de Carga Automática (Autoload) bajo el estándar PSR-4 con Composer
+**Profesor(a):** Ing. Irina Fong
+**Universidad Tecnológica de Panamá
+Facultad de Ingeniería en Sistemas Computacionales**
+
+---
+
+# 📌 Descripción del proyecto
+
+Este laboratorio consiste en la implementación del estándar **PSR-4** en PHP utilizando **Composer** para automatizar la carga de clases.
+
+El objetivo principal es eliminar el uso manual de instrucciones como:
+
+```php
+include
+require
+include_once
+require_once
+```
+
+y reemplazarlas por un sistema de carga automática profesional mediante:
+
+```php
+vendor/autoload.php
+```
+
+---
+
+# 🎯 Objetivos
+
+* Comprender el funcionamiento del estándar **PSR-4**
+* Configurar correctamente el archivo `composer.json`
+* Implementar namespaces en una aplicación PHP
+* Automatizar la carga de clases con Composer
+* Mejorar la organización y mantenibilidad del código
+
+---
+
+# 🛠 Tecnologías utilizadas
+
+* PHP
+* Composer
+* PSR-4
+* Apache / XAMPP
+* Visual Studio Code
+
+---
+
+# 📂 Estructura del proyecto
+
+```bash
+Lab4-DS7/
+│
+├── app/
+│   ├── Controllers/
+│   │   └── UsuarioController.php
+│   │
+│   ├── Models/
+│   │   └── Usuario.php
+│   │
+│   └── Config/
+│       └── Database.php
+│
+├── public/
+│   └── index.php
+│
+├── vendor/
+│
+├── composer.json
+├── composer.lock
+├── .gitignore
+└── README.md
+```
+
+---
+
+# 🧠 Relación Namespace ↔ Directorios
+
+| Namespace       | Directorio      |
+| --------------- | --------------- |
+| App\Controllers | app/Controllers |
+| App\Models      | app/Models      |
+| App\Config      | app/Config      |
+
+---
+
+# ⚙️ Configuración de Composer
+
+## Archivo `composer.json`
+
+```json
+{
+  "name": "lab4-ds7/autoload-psr4",
+  "version": "1.0.0",
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  }
+}
+```
+
+---
+
+# ▶️ Instalación y ejecución
+
+## 1. Clonar repositorio
+
+```bash
+git clone [URL_DEL_REPOSITORIO]
+```
+
+---
+
+## 2. Entrar al proyecto
+
+```bash
+cd Lab4-DS7
+```
+
+---
+
+## 3. Instalar dependencias
+
+```bash
+composer install
+```
+
+---
+
+## 4. Generar autoload
+
+```bash
+composer dump-autoload
+```
+
+---
+
+## 5. Ejecutar servidor local
+
+```bash
+php -S localhost:8000 -t public
+```
+
+---
+
+## 6. Abrir en navegador
+
+```text
+http://localhost:8000
+```
+
+---
+
+# 🧪 Evidencia de funcionamiento
+
+Al ejecutar correctamente el proyecto se muestra:
+
+```text
+Lab4 funcionando correctamente
+```
+
+Esto confirma que Composer está cargando automáticamente las clases definidas mediante namespaces.
+
+---
+
+# 📌 Ejemplo de implementación
+
+## `public/index.php`
+
+```php
+<?php
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use App\Controllers\UsuarioController;
+
+$controller = new UsuarioController();
+echo $controller->index();
+```
+
+---
+
+# 🚫 Archivo `.gitignore`
+
+```bash
+/vendor/
+```
+
+Esto evita subir dependencias generadas automáticamente.
+
+---
+
+# 🔍 Ventajas del uso de PSR-4
+
+* Organización profesional del proyecto
+* Eliminación de includes manuales
+* Carga automática bajo demanda
+* Escalabilidad del sistema
+* Compatibilidad con frameworks modernos
+
+---
+
+# 🧠 Conclusiones técnicas
+
+## 1. Mantenibilidad del código
+
+La implementación de PSR-4 facilita la incorporación de nuevas clases sin modificar archivos globales de configuración. Esto mejora significativamente el mantenimiento del sistema.
+
+---
+
+## 2. Optimización mediante carga bajo demanda
+
+Composer carga únicamente las clases necesarias durante la ejecución, optimizando el consumo de memoria y mejorando el rendimiento general.
+
+---
+
+## 3. Estandarización profesional
+
+El uso del estándar PSR-4 permite desarrollar aplicaciones siguiendo buenas prácticas reconocidas en la industria, facilitando el trabajo colaborativo.
+
+---
+
+## 4. Escalabilidad
+
+La organización basada en namespaces permite que el proyecto crezca ordenadamente sin perder estructura.
+
+---
+
+## 5. Reducción de errores
+
+Se eliminan errores frecuentes asociados al uso incorrecto de rutas en `include` y `require`.
+
+---
+
+# ✅ Resultado final
+
+Se logró implementar exitosamente el estándar **PSR-4** utilizando Composer, permitiendo una carga automática eficiente y una estructura organizada del proyecto.
+
+---
+
+# 📚 Referencias
+
+* Documentación oficial de Composer
+* PHP-FIG – PSR-4 Autoloader Standard
+* Material proporcionado en clase

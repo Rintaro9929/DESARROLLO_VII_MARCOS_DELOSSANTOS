@@ -1,0 +1,3 @@
+<?php
+echo OPENSSL_VERSION_TEXT;
+?>

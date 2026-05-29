@@ -17,6 +17,10 @@
      <ul>
         <li><a href="Laboratorio/Laboratorio1/laboratorio.php">Laboratorio #1</a></li>
     </ul>
+
+     <ul>
+        <li><a href="CookiesPHP.php">Cookies</a></li>
+    </ul>
 </div>
 
 </body>

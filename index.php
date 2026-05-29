@@ -21,6 +21,10 @@
      <ul>
         <li><a href="CookiesPHP.php">Cookies</a></li>
     </ul>
+
+     <ul>
+        <li><a href="MiniProyecto/public/index.php">Mini Proyecto</a></li>
+    </ul>
 </div>
 
 </body>

@@ -17,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require_once("../vendor/autoload.php");
 
 use Sonata\GoogleAuthenticator\GoogleAuthenticator;
-use Sonata\GoogleAuthenticator\GoogleQrUrl;
 
 $arrMensaje = array();
 
@@ -38,17 +37,31 @@ try {
             $userId = $MyRegistro->Guardar_RegistroUsuario();
 
             if ($userId) {
-                // Generar el secreto para 2FA
-                $g = new GoogleAuthenticator();
-                $secret = $g->generateSecret();
+                // Generar el secreto para 2FA (generador propio base32 compatible)
+                $secret = '';
+                $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+                $secretLength = 16; // longitud recomendada
+                try {
+                    for ($i = 0; $i < $secretLength; $i++) {
+                        $secret .= $chars[random_int(0, strlen($chars) - 1)];
+                    }
+                } catch (Exception $e) {
+                    // fallback a mt_rand si random_int no está disponible
+                    for ($i = 0; $i < $secretLength; $i++) {
+                        $secret .= $chars[mt_rand(0, strlen($chars) - 1)];
+                    }
+                }
 
                 if ($MyRegistro->GuardarMySecreto($secret)) {
                     $nombre_usuario = $MyRegistro->getUsuario();
                     $correo_usuario = $MyRegistro->getCorreo();
                     $nombre_aplicacion = "MiSistemaAutenticacion";
 
-                    // Generar URL para QR
-                    $url = GoogleQrUrl::generate($correo_usuario, $secret, $nombre_aplicacion);
+                    // Generar URL para QR (otpauth) compatible con Google Authenticator
+                    // Formato: otpauth://totp/{issuer}:{accountname}?secret={secret}&issuer={issuer}
+                    $issuer = rawurlencode($nombre_aplicacion);
+                    $account = rawurlencode($correo_usuario);
+                    $url = "otpauth://totp/{$issuer}:{$account}?secret={$secret}&issuer={$issuer}";
                     $qr_url = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . urlencode($url);
                     ?>
                     <!DOCTYPE html>

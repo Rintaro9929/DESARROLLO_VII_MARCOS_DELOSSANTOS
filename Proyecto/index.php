@@ -1,14 +1,39 @@
 <?php
 session_start();
-require_once("classes/CSRFProtection.php");
-require_once("comunes/loginfunciones.php");
+// CORREGIDO: Agregar la ruta correcta a CSRFProtection
+$csrfFile = __DIR__ . "/classes/CSRFProtection.php";
+if (file_exists($csrfFile)) {
+    require_once $csrfFile;
+} else {
+    // Ruta alternativa si se ejecuta desde un subdirectorio
+    require_once __DIR__ . "/../classes/CSRFProtection.php";
+}
+require_once(__DIR__ . "/comunes/loginfunciones.php");
+
+// Inicializar CSRF si es necesario
+if (!isset($_SESSION['csrf_token']) && class_exists('CSRFProtection')) {
+    if (method_exists('CSRFProtection', 'generarToken')) {
+        CSRFProtection::generarToken();
+    } elseif (method_exists('CSRFProtection', 'generateToken')) {
+        CSRFProtection::generateToken();
+    } else {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+}
+
+$csrfToken = '';
+if (class_exists('CSRFProtection') && method_exists('CSRFProtection', 'obtenerToken')) {
+    $csrfToken = CSRFProtection::obtenerToken();
+} elseif (isset($_SESSION['csrf_token'])) {
+    $csrfToken = $_SESSION['csrf_token'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="<?php echo CSRFProtection::obtenerToken(); ?>">
+    <meta name="csrf-token" content="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
     <title>Inicio - Sistema de Autenticación con 2FA</title>
     <style>
         * {

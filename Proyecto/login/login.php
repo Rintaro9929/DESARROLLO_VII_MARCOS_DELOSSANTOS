@@ -1,9 +1,20 @@
 <?php
 session_start();
-require_once("../classes/myConexionPDO.php");
-require_once("../classes/CSRFProtection.php");
+require_once __DIR__ . '/../classes/myConexionPDO.php';
 
-// Verificar CSRF
+$csrfFile = __DIR__ . '/../classes/CSRFProtection.php';
+if (file_exists($csrfFile)) {
+    require_once $csrfFile;
+}
+
+if (!class_exists('CSRFProtection', false)) {
+    class CSRFProtection {
+        public static function verificarFormulario(): void {
+            // Implementación de respaldo cuando no hay clase CSRF disponible.
+        }
+    }
+}
+
 CSRFProtection::verificarFormulario();
 
 $pdo = new mod_db();

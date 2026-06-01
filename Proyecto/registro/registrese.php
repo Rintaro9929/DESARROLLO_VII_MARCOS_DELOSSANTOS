@@ -6,7 +6,14 @@ require_once("../classes/CSRFProtection.php");
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="csrf-token" content="<?php echo CSRFProtection::obtenerToken(); ?>">
+    <?php
+    // Safely obtain CSRF token only if the class and method are available
+    $csrfToken = '';
+    if (class_exists('CSRFProtection') && method_exists('CSRFProtection', 'obtenerToken')) {
+        $csrfToken = CSRFProtection::obtenerToken();
+    }
+    ?>
+    <meta name="csrf-token" content="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
     <title>Registro de Usuario - Sistema con 2FA</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>

@@ -128,7 +128,7 @@ class mod_db
         }
     }
 
-    public function objects($stmt = "")
+    public function objects($stmt = null)
     {
         return $stmt ? $stmt->fetch(PDO::FETCH_OBJ) : null;
     }

@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once("../classes/CSRFProtection.php");
+// ✅ CORREGIDO: Usar __DIR__ para ruta absoluta
+require_once(__DIR__ . "/../classes/CSRFProtection.php");
 
 // Verificar que el usuario ha pasado el primer factor
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['2fa_pending'])) {
@@ -14,11 +15,11 @@ if (isset($_SESSION['2fa_verified']) && $_SESSION['2fa_verified'] === true) {
     exit;
 }
 
-require_once("../vendor/autoload.php");
+// ✅ CORREGIDO: Usar __DIR__ para ruta absoluta
+require_once(__DIR__ . "/../vendor/autoload.php");
+
 // Provide a lightweight fallback GoogleAuthenticator implementation when the
-// external Sonata\GoogleAuthenticator package isn't available. This avoids
-// "undefined class" errors from static analysis and allows verification to
-// continue using standard TOTP (RFC 6238).
+// external Sonata\GoogleAuthenticator package isn't available.
 if (!class_exists('Sonata\\GoogleAuthenticator\\GoogleAuthenticator')) {
     // Define a local implementation and alias it into the Sonata namespace.
     class Local_GoogleAuthenticator_Fallback
@@ -228,8 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         <form method="POST" action="">
             <?php
-                // Backwards-compatible CSRF field output: prefer class method if available,
-                // otherwise fall back to a hidden input using a session-stored token.
+                // Backwards-compatible CSRF field output
                 if (method_exists('CSRFProtection', 'campo')) {
                     echo CSRFProtection::campo();
                 } else {

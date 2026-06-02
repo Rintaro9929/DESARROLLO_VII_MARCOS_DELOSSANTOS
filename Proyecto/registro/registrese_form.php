@@ -1,22 +1,6 @@
-<?php require_once '../includes/CSRFProtection.php'; ?>
-
 <form id="form1" name="form1" method="post" action="procesar_registro.php">
-    <?php
-    // Render CSRF hidden field. If the CSRFProtection class does not provide campoHidden(),
-    // fall back to a simple session-based token to avoid fatal errors.
-    if (class_exists('CSRFProtection') && method_exists('CSRFProtection', 'campoHidden')) {
-        echo CSRFProtection::campoHidden();
-    } else {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_start();
-        }
-        if (empty($_SESSION['csrf_token'])) {
-            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-        }
-        echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') . '" />';
-    }
-    ?>
-    
+    <!-- Token CSRF manual -->
+    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
     <input type="hidden" name="Accion" value="Guardar">
     
     <fieldset>
@@ -62,11 +46,11 @@
     </fieldset>
     <br>
     
-    <input type="submit" name="Submit" value="Registrarse">
-    <input type="reset" name="Reset" value="Limpiar">
+    <button type="submit">📝 Registrarse</button>
+    <button type="reset">🗑️ Limpiar</button>
 </form>
 
-<script type="text/javascript">
+<script>
 $(document).ready(function () {
     $("#form1").validate({
         rules: {
@@ -84,37 +68,65 @@ $(document).ready(function () {
             sexo: "required"
         },
         messages: {
-            nombre: "Por favor ingrese su nombre",
-            apellido: "Por favor ingrese su apellido",
-            usuario: "Por favor ingrese un nombre de usuario",
-            clave: "Por favor ingrese una contraseña",
+            nombre: "Ingrese su nombre",
+            apellido: "Ingrese su apellido",
+            usuario: "Ingrese un nombre de usuario",
+            clave: "Ingrese una contraseña",
             clave_again: "Las contraseñas no coinciden",
-            email1: "Por favor ingrese un email válido",
-            sexo: "Por favor seleccione su sexo"
+            email1: "Ingrese un email válido",
+            sexo: "Seleccione su sexo"
         }
     });
 });
 </script>
 
 <style>
-    #field, label { float: left; font-family: Arial, Helvetica, sans-serif; font-size: small; }
-    label { width: 150px; height: 10px; }
-    br { clear:both; }
-    input.submit { float: none; }
-    input.error { border: 1px solid red; width: auto; }
-    label.error {
-        background: url('../img/error.gif') no-repeat;
-        padding-left: 16px;
-        margin-left: .3em;
-        color: #FF0000;
-    }
     fieldset {
-        margin: 5px;
-        padding: 8px;
-        border: 1px solid #ccc;
+        margin: 8px 0;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
     }
     legend {
         font-weight: bold;
         color: #333;
+        padding: 0 10px;
+    }
+    input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    button[type="submit"] {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    button[type="reset"] {
+        background: #6c757d;
+        color: white;
+    }
+    label.error {
+        color: red;
+        font-size: 12px;
+        display: block;
+        margin-top: 5px;
+    }
+    input.error {
+        border-color: red;
     }
 </style>

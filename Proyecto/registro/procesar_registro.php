@@ -4,17 +4,18 @@ ini_set('display_errors', 1);
 ini_set("log_errors", 1);
 ini_set("error_log", __DIR__ . "/../logs/php_error.log");
 
-require_once("../classes/myConexionPDO.php");
-require_once("../classes/SanitizarEntrada.php");
-require_once("../classes/ClaseRegistrese.php");
-require_once("../classes/CSRFProtection.php");
+require_once(__DIR__ . "/../classes/myConexionPDO.php");
+require_once(__DIR__ . "/../classes/SanitizarEntrada.php");
+require_once(__DIR__ . "/../classes/ClaseRegistrese.php");
+require_once(__DIR__ . "/../classes/CSRFProtection.php");
 
 // Verificar CSRF
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     CSRFProtection::verificarFormulario();
 }
 
-require_once("../vendor/autoload.php");
+// ✅ AHORA SÍ, el archivo vendor/autoload.php YA EXISTE
+require_once(__DIR__ . "/../vendor/autoload.php");
 
 use Sonata\GoogleAuthenticator\GoogleAuthenticator;
 
@@ -37,31 +38,17 @@ try {
             $userId = $MyRegistro->Guardar_RegistroUsuario();
 
             if ($userId) {
-                // Generar el secreto para 2FA (generador propio base32 compatible)
-                $secret = '';
-                $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-                $secretLength = 16; // longitud recomendada
-                try {
-                    for ($i = 0; $i < $secretLength; $i++) {
-                        $secret .= $chars[random_int(0, strlen($chars) - 1)];
-                    }
-                } catch (Exception $e) {
-                    // fallback a mt_rand si random_int no está disponible
-                    for ($i = 0; $i < $secretLength; $i++) {
-                        $secret .= $chars[mt_rand(0, strlen($chars) - 1)];
-                    }
-                }
+                // ✅ USAR LA LIBRERÍA DE GOOGLE AUTHENTICATOR
+                $g = new GoogleAuthenticator();
+                $secret = $g->generateSecret();
 
                 if ($MyRegistro->GuardarMySecreto($secret)) {
                     $nombre_usuario = $MyRegistro->getUsuario();
                     $correo_usuario = $MyRegistro->getCorreo();
                     $nombre_aplicacion = "MiSistemaAutenticacion";
 
-                    // Generar URL para QR (otpauth) compatible con Google Authenticator
-                    // Formato: otpauth://totp/{issuer}:{accountname}?secret={secret}&issuer={issuer}
-                    $issuer = rawurlencode($nombre_aplicacion);
-                    $account = rawurlencode($correo_usuario);
-                    $url = "otpauth://totp/{$issuer}:{$account}?secret={$secret}&issuer={$issuer}";
+                    // Generar URL para QR usando la librería
+                    $url = $g->getUrl($correo_usuario, $nombre_aplicacion, $secret);
                     $qr_url = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . urlencode($url);
                     ?>
                     <!DOCTYPE html>
@@ -87,25 +74,27 @@ try {
                                 padding: 30px;
                                 text-align: center;
                                 box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                                max-width: 400px;
+                                max-width: 450px;
                                 width: 100%;
                             }
                             .qr-container img {
                                 border-radius: 10px;
                                 margin: 20px 0;
                                 box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                                background: white;
+                                padding: 10px;
                             }
                             .qr-label {
-                                background: #f0f0f0;
+                                background: #f0f7ff;
                                 padding: 15px;
                                 border-radius: 10px;
                                 margin: 15px 0;
                             }
                             .secret-code {
-                                background: #e8e8e8;
-                                padding: 10px;
-                                border-radius: 5px;
-                                font-family: monospace;
+                                background: #f5f5f5;
+                                padding: 12px;
+                                border-radius: 8px;
+                                font-family: 'Courier New', monospace;
                                 font-size: 14px;
                                 word-break: break-all;
                                 margin: 10px 0;
@@ -129,15 +118,33 @@ try {
                                 margin-bottom: 10px;
                             }
                             .warning {
-                                color: #e74c3c;
+                                background: #fff3cd;
+                                color: #856404;
+                                padding: 12px;
+                                border-radius: 8px;
                                 font-size: 12px;
-                                margin-top: 15px;
+                                margin-top: 20px;
+                                text-align: left;
+                            }
+                            .success-icon {
+                                font-size: 50px;
+                                margin-bottom: 10px;
+                            }
+                            ol {
+                                text-align: left;
+                                margin: 15px 0;
+                                padding-left: 20px;
+                            }
+                            li {
+                                margin: 8px 0;
+                                font-size: 13px;
                             }
                         </style>
                     </head>
                     <body>
                         <div class="qr-container">
-                            <h2>✅ ¡Registro Exitoso!</h2>
+                            <div class="success-icon">✅</div>
+                            <h2>¡Registro Exitoso!</h2>
                             <p>Bienvenido(a) <strong><?php echo htmlspecialchars($nombre_usuario); ?></strong></p>
                             
                             <div class="qr-label">
@@ -148,23 +155,25 @@ try {
                             <img src="<?php echo $qr_url; ?>" alt="Código QR para Google Authenticator">
                             
                             <div class="secret-code">
-                                <strong>Código secreto (si no puedes escanear el QR):</strong><br>
+                                <strong>📱 Código secreto (si no puedes escanear):</strong><br>
                                 <?php echo chunk_split($secret, 4, ' '); ?>
                             </div>
                             
-                            <p><strong>Instrucciones:</strong></p>
-                            <ol style="text-align: left;">
-                                <li>Descarga Google Authenticator desde tu tienda de apps</li>
-                                <li>Abre la app y presiona "+" para agregar una cuenta</li>
-                                <li>Selecciona "Escanear código QR"</li>
-                                <li>Escanea este código con tu celular</li>
-                                <li>La app generará un código de 6 dígitos que cambiará cada 30 segundos</li>
-                            </ol>
+                            <div style="text-align: left;">
+                                <strong>📋 Instrucciones:</strong>
+                                <ol>
+                                    <li>📲 Descarga <strong>Google Authenticator</strong> desde tu tienda de apps</li>
+                                    <li>➕ Abre la app y presiona "+" para agregar una cuenta</li>
+                                    <li>📷 Selecciona <strong>"Escanear código QR"</strong></li>
+                                    <li>🔍 Escanea este código con tu celular</li>
+                                    <li>⏰ La app generará un código de 6 dígitos que cambia cada 30 segundos</li>
+                                </ol>
+                            </div>
                             
-                            <a href="../login.php" class="btn">🔑 Ir al Inicio de Sesión</a>
+                            <a href="../login/login.php" class="btn">🔑 Ir al Inicio de Sesión</a>
                             
                             <div class="warning">
-                                ⚠️ IMPORTANTE: Guarda este código secreto en un lugar seguro. 
+                                ⚠️ <strong>IMPORTANTE:</strong> Guarda este código secreto en un lugar seguro. 
                                 No lo compartas con nadie. Si pierdes acceso a tu app, necesitarás este código para recuperar tu cuenta.
                             </div>
                         </div>
@@ -180,17 +189,21 @@ try {
         }
     } else {
         // Mostrar errores
-        echo "<div style='color:red; padding:20px;'>";
-        echo "<h3>Errores en el registro:</h3><ul>";
+        echo "<div style='color:red; padding:20px; background:#fff; border-radius:10px; max-width:500px; margin:50px auto;'>";
+        echo "<h3>❌ Errores en el registro:</h3><ul>";
         foreach ($arrMensaje as $val) {
             echo "<li>" . htmlspecialchars($val) . "</li>";
         }
-        echo "</ul><a href='registrese.php'>Volver al formulario</a>";
+        echo "</ul><a href='registrese.php'>← Volver al formulario</a>";
         echo "</div>";
     }
 } catch (Exception $e) {
     error_log("Error en registro: " . $e->getMessage());
-    echo "Ha ocurrido un error al procesar la solicitud. Por favor, intente más tarde.";
+    echo "<div style='color:red; padding:20px; background:#fff; border-radius:10px; max-width:500px; margin:50px auto;'>";
+    echo "<h3>❌ Ha ocurrido un error</h3>";
+    echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "<a href='registrese.php'>← Volver al formulario</a>";
+    echo "</div>";
 } finally {
     $pdo = null;
     $MyRegistro = null;

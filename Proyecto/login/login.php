@@ -1,82 +1,54 @@
 <?php
 session_start();
-require_once __DIR__ . '/../classes/myConexionPDO.php';
+require_once(__DIR__ . "/../classes/CSRFProtection.php");
 
-$csrfFile = __DIR__ . '/../classes/CSRFProtection.php';
-if (file_exists($csrfFile)) {
-    require_once $csrfFile;
-}
+CSRFProtection::generarToken();
 
-if (!class_exists('CSRFProtection', false)) {
-    class CSRFProtection {
-        public static function verificarFormulario(): void {
-            // Implementación de respaldo cuando no hay clase CSRF disponible.
-        }
-    }
-}
-
-CSRFProtection::verificarFormulario();
-
-$pdo = new mod_db();
-$email = $_POST['email'] ?? '';
-$password = $_POST['password'] ?? '';
-
-// Registrar intento de login en auditoría
-$ip = $_SERVER['REMOTE_ADDR'];
-$user_agent = $_SERVER['HTTP_USER_AGENT'];
-
-try {
-    // Buscar usuario por email
-    $sql = "SELECT * FROM usuarios WHERE Correo = :email";
-    $stmt = $pdo->executeQuery($sql);
-    $stmt->bindParam(':email', $email);
-    $stmt->execute();
-    $usuario = $stmt->fetch(PDO::FETCH_OBJ);
-    
-    $status = 'fallido';
-    
-    if ($usuario && password_verify($password, $usuario->HashMagic)) {
-        $status = 'exitoso';
-        
-        // Guardar en sesión los datos del usuario
-        $_SESSION['user_id'] = $usuario->id;
-        $_SESSION['user_email'] = $usuario->Correo;
-        $_SESSION['user_name'] = $usuario->Nombre . ' ' . $usuario->Apellido;
-        $_SESSION['2fa_pending'] = true;  // Marcar que necesita 2FA
-        $_SESSION['secret_2fa'] = $usuario->secret_2fa;
-        
-        // Registrar en auditoría
-        $auditSql = "INSERT INTO login_audit (username, status, ip_address, user_agent, login_time) 
-                     VALUES (:email, :status, :ip, :ua, NOW())";
-        $auditStmt = $pdo->executeQuery($auditSql);
-        $auditStmt->bindParam(':email', $email);
-        $auditStmt->bindParam(':status', $status);
-        $auditStmt->bindParam(':ip', $ip);
-        $auditStmt->bindParam(':ua', $user_agent);
-        $auditStmt->execute();
-        
-        // Redirigir a verificación 2FA
-        header("Location: verificar_2fa.php");
-        exit;
-    } else {
-        // Registrar intento fallido
-        $auditSql = "INSERT INTO login_audit (username, status, ip_address, user_agent, login_time) 
-                     VALUES (:email, :status, :ip, :ua, NOW())";
-        $auditStmt = $pdo->executeQuery($auditSql);
-        $auditStmt->bindParam(':email', $email);
-        $auditStmt->bindParam(':status', $status);
-        $auditStmt->bindParam(':ip', $ip);
-        $auditStmt->bindParam(':ua', $user_agent);
-        $auditStmt->execute();
-        
-        $_SESSION['login_error'] = "Credenciales incorrectas";
-        header("Location: login.php");
-        exit;
-    }
-} catch (PDOException $e) {
-    error_log("Error en login: " . $e->getMessage());
-    $_SESSION['login_error'] = "Error en el sistema. Intente más tarde.";
-    header("Location: login.php");
+if (isset($_SESSION['user_id']) && isset($_SESSION['2fa_verified']) && $_SESSION['2fa_verified'] === true) {
+    header("Location: ../dashboard.php");
     exit;
 }
 ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio de Sesión - Sistema 2FA</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;display:flex;justify-content:center;align-items:center}
+        .login-container{background:#fff;border-radius:10px;box-shadow:0 15px 35px rgba(0,0,0,0.2);width:400px;padding:40px}
+        h2{text-align:center;margin-bottom:30px;color:#333}
+        .form-group{margin-bottom:20px}
+        label{display:block;margin-bottom:5px;color:#666}
+        input{width:100%;padding:12px;border:1px solid #ddd;border-radius:5px;font-size:16px}
+        input:focus{outline:none;border-color:#667eea}
+        button{width:100%;padding:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:5px;font-size:16px;cursor:pointer}
+        button:hover{transform:scale(1.02)}
+        .register-link{text-align:center;margin-top:20px}
+        .register-link a{color:#667eea;text-decoration:none}
+        .error{background:#fee;color:#c33;padding:10px;border-radius:5px;margin-bottom:20px;text-align:center}
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>🔐 Iniciar Sesión</h2>
+        <?php if (isset($_SESSION['login_error'])): ?>
+            <div class="error"><?php echo $_SESSION['login_error']; unset($_SESSION['login_error']); ?></div>
+        <?php endif; ?>
+        <form method="POST" action="procesar_login.php">
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+            <div class="form-group">
+                <label>📧 Correo Electrónico</label>
+                <input type="text" name="email" required autofocus>
+            </div>
+            <div class="form-group">
+                <label>🔒 Contraseña</label>
+                <input type="password" name="password" required>
+            </div>
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+        <div class="register-link">¿No tienes cuenta? <a href="../registro/registrese.php">Regístrate aquí</a></div>
+    </div>
+</body>
+</html>

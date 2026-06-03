@@ -1,5 +1,4 @@
 <form id="form1" name="form1" method="post" action="procesar_registro.php">
-    <!-- Token CSRF manual -->
     <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
     <input type="hidden" name="Accion" value="Guardar">
     
@@ -58,13 +57,8 @@ $(document).ready(function () {
             apellido: "required",
             usuario: "required",
             clave: "required",
-            clave_again: {
-                equalTo: "#clave"
-            },
-            email1: {
-                required: true,
-                email: true
-            },
+            clave_again: { equalTo: "#clave" },
+            email1: { required: true, email: true },
             sexo: "required"
         },
         messages: {
@@ -79,54 +73,3 @@ $(document).ready(function () {
     });
 });
 </script>
-
-<style>
-    fieldset {
-        margin: 8px 0;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-    }
-    legend {
-        font-weight: bold;
-        color: #333;
-        padding: 0 10px;
-    }
-    input {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        box-sizing: border-box;
-    }
-    input:focus {
-        outline: none;
-        border-color: #667eea;
-    }
-    button {
-        width: 100%;
-        padding: 10px;
-        margin-top: 10px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-    button[type="submit"] {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-    }
-    button[type="reset"] {
-        background: #6c757d;
-        color: white;
-    }
-    label.error {
-        color: red;
-        font-size: 12px;
-        display: block;
-        margin-top: 5px;
-    }
-    input.error {
-        border-color: red;
-    }
-</style>

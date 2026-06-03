@@ -63,12 +63,24 @@ class RegistroUsuario
 
     public function verificarEmailExistente()
     {
+        if ($this->pdo === null || $this->pdo->getConexion() === null) {
+            error_log("Error: No hay conexión a la base de datos");
+            return false;
+        }
+        
         $sql = "SELECT COUNT(*) as total FROM usuarios WHERE Correo = :email";
         $stmt = $this->pdo->executeQuery($sql);
+        
+        if ($stmt === null) {
+            error_log("Error: executeQuery devolvió null");
+            return false;
+        }
+        
         $stmt->bindParam(':email', $this->Correo);
         $stmt->execute();
         $resultado = $stmt->fetch(PDO::FETCH_OBJ);
-        return $resultado->total > 0;
+        
+        return $resultado && $resultado->total > 0;
     }
 
     public function Guardar_RegistroUsuario()

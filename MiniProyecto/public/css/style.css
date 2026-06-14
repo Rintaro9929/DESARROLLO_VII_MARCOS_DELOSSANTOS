@@ -191,3 +191,21 @@ footer {
 
     color: #555;
 }
+
+/* ==========================
+   BOTÓN VOLVER */
+
+.btn-volver {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #7b9e87;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    border: none;
+}
+
+.btn-volver:hover {
+    background-color: #6b8f71;
+}

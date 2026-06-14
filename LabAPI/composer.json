@@ -1,0 +1,13 @@
+{
+    "name": "marco/lab-api",
+    "description": "Laboratorio API REST con JWT",
+    "type": "project",
+    "require": {
+        "firebase/php-jwt": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Marco\\LabApi\\": "src/"
+        }
+    }
+}

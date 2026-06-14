@@ -1,7 +1,8 @@
 <?php
 
-// Importar archivos
+// Cargar archivos necesarios
 require_once __DIR__ . '/../app/views/header.php';
+require_once __DIR__ . '/../app/utils/Utilidades.php';
 require_once __DIR__ . '/../app/utils/Navegacion.php';
 
 // Arreglo de edades
@@ -13,41 +14,18 @@ $edades = [10, 15, 25, 70, 8];
 
     <h2>Problema #5</h2>
 
-    <?php
+    <?php foreach ($edades as $edad) : ?>
 
-    // Recorrer edades
-    foreach ($edades as $edad) {
+        <p>
 
-        // Clasificación
-        switch (true) {
+            <?php echo $edad; ?> años =
+            <?php echo Utilidades::clasificarEdad($edad); ?>
 
-            case ($edad >= 0 && $edad <= 12):
+        </p>
 
-                echo "<p>$edad años = Niño</p>";
+    <?php endforeach; ?>
 
-                break;
-
-            case ($edad >= 13 && $edad <= 17):
-
-                echo "<p>$edad años = Adolescente</p>";
-
-                break;
-
-            case ($edad >= 18 && $edad <= 64):
-
-                echo "<p>$edad años = Adulto</p>";
-
-                break;
-
-            default:
-
-                echo "<p>$edad años = Adulto Mayor</p>";
-        }
-    }
-
-    echo Navegacion::volverMenu('index.php');
-
-    ?>
+    <?php echo Navegacion::volverMenu('index.php'); ?>
 
 </div>
 

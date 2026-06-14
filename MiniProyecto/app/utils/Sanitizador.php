@@ -4,17 +4,16 @@ class Sanitizador
 {
     public static function limpiarTexto($texto)
     {
-        return htmlspecialchars(trim($texto));
-    }
-
-    public static function limpiarCorreo($correo)
-    {
-        return filter_var($correo, FILTER_SANITIZE_EMAIL);
+        return htmlspecialchars(trim($texto), ENT_QUOTES, 'UTF-8');
     }
 
     public static function limpiarNumero($numero)
     {
-        return filter_var($numero, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        return filter_var($numero, FILTER_VALIDATE_INT);
+    }
+
+    public static function limpiarDecimal($numero)
+    {
+        return filter_var($numero, FILTER_VALIDATE_FLOAT);
     }
 }
-?>

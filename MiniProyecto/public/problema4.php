@@ -1,26 +1,13 @@
 <?php
 
-// Importar archivos
+// Cargar archivos necesarios
 require_once __DIR__ . '/../app/views/header.php';
+require_once __DIR__ . '/../app/utils/Utilidades.php';
 require_once __DIR__ . '/../app/utils/Navegacion.php';
 
-// Variables
-$pares = 0;
-$impares = 0;
-
-// Recorrer números
-for ($i = 1; $i <= 200; $i++) {
-
-    // Verificar si es par
-    if ($i % 2 == 0) {
-
-        $pares += $i;
-
-    } else {
-
-        $impares += $i;
-    }
-}
+// Calcular resultados
+$pares = Utilidades::sumarPares(1, 200);
+$impares = Utilidades::sumarImpares(1, 200);
 
 ?>
 
@@ -28,9 +15,15 @@ for ($i = 1; $i <= 200; $i++) {
 
     <h2>Problema #4</h2>
 
-    <p>Suma de pares: <?php echo $pares; ?></p>
+    <p>
+        <strong>Suma de números pares:</strong>
+        <?php echo $pares; ?>
+    </p>
 
-    <p>Suma de impares: <?php echo $impares; ?></p>
+    <p>
+        <strong>Suma de números impares:</strong>
+        <?php echo $impares; ?>
+    </p>
 
     <?php echo Navegacion::volverMenu('index.php'); ?>
 

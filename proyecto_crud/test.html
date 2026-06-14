@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+</head>
+<body>
+    <h1>Probando conexión</h1>
+    <button onclick="test()">Probar</button>
+    <pre id="resultado"></pre>
+
+    <script>
+        async function test() {
+            const formData = new FormData();
+            formData.append('accion', 'Buscar');
+            formData.append('termino', '');
+            
+            const response = await fetch('registrar.php', { method: 'POST', body: formData });
+            const data = await response.json();
+            document.getElementById('resultado').innerHTML = JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>

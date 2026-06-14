@@ -1,31 +1,48 @@
 <?php
 
-// Importar archivos
+// Cargar archivos necesarios
 require_once __DIR__ . '/../app/views/header.php';
+require_once __DIR__ . '/../app/utils/Utilidades.php';
 require_once __DIR__ . '/../app/utils/Navegacion.php';
+require_once __DIR__ . '/../app/utils/Sanitizador.php';
+require_once __DIR__ . '/../app/utils/ErrorLogger.php';
 
 // Variables
 $resultados = [];
-$error = "";
+$error = '';
 
-// Verificar formulario
+// Procesar formulario
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Obtener número
-    $numero = (int) $_POST['numero'];
+    try {
 
-    // Validar rango
-    if ($numero >= 1 && $numero <= 9) {
+        // Obtener número
+        $numero = Sanitizador::limpiarNumero($_POST['numero']);
 
-        // Generar potencias
-        for ($i = 1; $i <= 15; $i++) {
+        // Validar rango permitido
+        if ($numero === false || $numero < 1 || $numero > 9) {
 
-            $resultados[] = "$numero ^ $i = " . pow($numero, $i);
+            throw new Exception(
+                'Debe ingresar un número entre 1 y 9.'
+            );
         }
 
-    } else {
+        // Generar potencias
+        $resultados = Utilidades::generarPotencias(
+            $numero,
+            15
+        );
 
-        $error = "Ingrese un número entre 1 y 9";
+    } catch (Exception $e) {
+
+        // Registrar error
+        $logger = new ErrorLogger();
+
+        $logger->registrarError(
+            $e->getMessage()
+        );
+
+        $error = $e->getMessage();
     }
 }
 
@@ -37,9 +54,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <form method="POST">
 
-        <label>Número:</label>
+        <label for="numero">Número:</label>
 
-        <input type="number" name="numero" min="1" max="9" required>
+        <input
+            type="number"
+            id="numero"
+            name="numero"
+            min="1"
+            max="9"
+            required
+        >
 
         <button type="submit">Generar</button>
 
@@ -47,23 +71,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <br>
 
-    <?php
+    <?php if (!empty($error)) : ?>
 
-    // Mostrar error
-    if ($error) {
+        <div class="error">
 
-        echo "<p>$error</p>";
-    }
+            <?php echo htmlspecialchars($error); ?>
 
-    // Mostrar resultados
-    foreach ($resultados as $resultado) {
+        </div>
 
-        echo "<p>$resultado</p>";
-    }
+    <?php endif; ?>
 
-    echo Navegacion::volverMenu('index.php');
+    <?php foreach ($resultados as $resultado) : ?>
 
-    ?>
+        <p>
+
+            <?php echo htmlspecialchars($resultado); ?>
+
+        </p>
+
+    <?php endforeach; ?>
+
+    <?php echo Navegacion::volverMenu('index.php'); ?>
 
 </div>
 

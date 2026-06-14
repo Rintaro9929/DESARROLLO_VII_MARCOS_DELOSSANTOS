@@ -1,18 +1,15 @@
 <?php
 
-// Importar archivos
+// Cargar archivos necesarios
 require_once __DIR__ . '/../app/views/header.php';
+require_once __DIR__ . '/../app/utils/Utilidades.php';
 require_once __DIR__ . '/../app/utils/Navegacion.php';
 
-// Presupuesto
+// Presupuesto total
 $presupuesto = 100000;
 
-// Calcular porcentajes
-$ginecologia = $presupuesto * 0.40;
-
-$traumatologia = $presupuesto * 0.35;
-
-$pediatria = $presupuesto * 0.25;
+// Distribuir presupuesto
+$areas = Utilidades::distribuirPresupuesto($presupuesto);
 
 ?>
 
@@ -20,11 +17,25 @@ $pediatria = $presupuesto * 0.25;
 
     <h2>Problema #6</h2>
 
-    <p>Ginecología: $<?php echo $ginecologia; ?></p>
+    <p>
+        <strong>Presupuesto total:</strong>
+        $<?php echo number_format($presupuesto, 2); ?>
+    </p>
 
-    <p>Traumatología: $<?php echo $traumatologia; ?></p>
+    <p>
+        <strong>Ginecología:</strong>
+        $<?php echo number_format($areas['ginecologia'], 2); ?>
+    </p>
 
-    <p>Pediatría: $<?php echo $pediatria; ?></p>
+    <p>
+        <strong>Traumatología:</strong>
+        $<?php echo number_format($areas['traumatologia'], 2); ?>
+    </p>
+
+    <p>
+        <strong>Pediatría:</strong>
+        $<?php echo number_format($areas['pediatria'], 2); ?>
+    </p>
 
     <?php echo Navegacion::volverMenu('index.php'); ?>
 

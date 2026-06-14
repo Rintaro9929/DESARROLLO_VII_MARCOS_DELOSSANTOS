@@ -1,22 +1,42 @@
 <?php
 
-// Importar archivos reutilizables
+// Cargar archivos necesarios
 require_once __DIR__ . '/../app/views/header.php';
 require_once __DIR__ . '/../app/utils/Navegacion.php';
+require_once __DIR__ . '/../app/utils/Sanitizador.php';
+require_once __DIR__ . '/../app/utils/ErrorLogger.php';
 
-// Arreglo para guardar resultados
+// Variables
 $resultados = [];
+$error = '';
 
-// Verificar si se envió el formulario
+// Procesar formulario
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Obtener número
-    $numero = (int) $_POST['numero'];
+    try {
 
-    // Generar múltiplos
-    for ($i = 1; $i <= $numero; $i++) {
+        // Obtener y validar número
+        $numero = Sanitizador::limpiarNumero($_POST['numero']);
 
-        $resultados[] = "4 x $i = " . (4 * $i);
+        if ($numero === false || $numero <= 0) {
+            throw new Exception(
+                'Debe ingresar un número entero mayor que cero.'
+            );
+        }
+
+        // Generar múltiplos de 4
+        for ($i = 1; $i <= $numero; $i++) {
+
+            $resultados[] = "4 x $i = " . (4 * $i);
+        }
+
+    } catch (Exception $e) {
+
+        // Registrar error
+        $logger = new ErrorLogger();
+        $logger->registrarError($e->getMessage());
+
+        $error = $e->getMessage();
     }
 }
 
@@ -26,11 +46,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <h2>Problema #2</h2>
 
+    <p>Mostrar los múltiplos de 4 hasta la cantidad indicada.</p>
+
     <form method="POST">
 
-        <label>Cantidad:</label>
+        <label for="numero">Cantidad:</label>
 
-        <input type="number" name="numero" required>
+        <input
+            type="number"
+            id="numero"
+            name="numero"
+            min="1"
+            required
+        >
 
         <button type="submit">Calcular</button>
 
@@ -38,18 +66,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <br>
 
-    <?php
+    <?php if (!empty($error)) : ?>
 
-    // Mostrar resultados
-    foreach ($resultados as $resultado) {
+        <div class="error">
+            <?php echo htmlspecialchars($error); ?>
+        </div>
 
-        echo "<p>$resultado</p>";
-    }
+    <?php endif; ?>
 
-    // Botón volver
-    echo Navegacion::volverMenu('index.php');
+    <?php if (!empty($resultados)) : ?>
 
-    ?>
+        <h3>Resultados</h3>
+
+        <?php foreach ($resultados as $resultado) : ?>
+
+            <p><?php echo htmlspecialchars($resultado); ?></p>
+
+        <?php endforeach; ?>
+
+    <?php endif; ?>
+
+    <?php echo Navegacion::volverMenu('index.php'); ?>
 
 </div>
 

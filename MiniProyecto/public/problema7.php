@@ -1,49 +1,26 @@
 <?php
 
-// Importar archivos
+// Cargar archivos necesarios
 require_once __DIR__ . '/../app/views/header.php';
+require_once __DIR__ . '/../app/utils/Utilidades.php';
 require_once __DIR__ . '/../app/utils/Navegacion.php';
 
 // Mes de ejemplo
 $mes = 5;
 
-// Verificar estación
-switch ($mes) {
-
-    case 12:
-    case 1:
-    case 2:
-
-        $estacion = "Invierno";
-
-        break;
-
-    case 3:
-    case 4:
-    case 5:
-
-        $estacion = "Primavera";
-
-        break;
-
-    case 6:
-    case 7:
-    case 8:
-
-        $estacion = "Verano";
-
-        break;
-
-    default:
-
-        $estacion = "Otoño";
-}
+// Obtener estación
+$estacion = Utilidades::obtenerEstacion($mes);
 
 ?>
 
 <div class="container">
 
     <h2>Problema #7</h2>
+
+    <p>
+        <strong>Mes seleccionado:</strong>
+        <?php echo $mes; ?>
+    </p>
 
     <p>La estación del año es:</p>
 

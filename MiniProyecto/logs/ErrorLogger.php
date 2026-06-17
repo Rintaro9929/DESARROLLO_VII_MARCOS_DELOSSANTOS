@@ -7,11 +7,15 @@ interface ErrorHandlerInterface
 
 class ErrorLogger implements ErrorHandlerInterface
 {
-    private $archivo = '../logs/errores.log';
+    private $archivo;
+
+    public function __construct()
+    {
+        $this->archivo = __DIR__ . '/../../logs/errores.log';
+    }
 
     public function registrarError($mensaje)
     {
-        // Crear carpeta logs si no existe
         $directorio = dirname($this->archivo);
 
         if (!is_dir($directorio)) {
@@ -22,8 +26,11 @@ class ErrorLogger implements ErrorHandlerInterface
         $texto = "[$fecha] ERROR: $mensaje" . PHP_EOL;
 
         if (file_put_contents($this->archivo, $texto, FILE_APPEND) === false) {
-            throw new Exception("No se pudo registrar el error en el archivo de log.");
+            throw new Exception(
+                "No se pudo registrar el error en el archivo de log."
+            );
         }
     }
 }
+
 ?>

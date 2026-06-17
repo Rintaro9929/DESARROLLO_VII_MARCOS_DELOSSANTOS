@@ -4,7 +4,7 @@
 require_once __DIR__ . '/../app/views/header.php';
 require_once __DIR__ . '/../app/utils/Navegacion.php';
 require_once __DIR__ . '/../app/utils/Sanitizador.php';
-require_once __DIR__ . '/../app/utils/ErrorLogger.php';
+require_once __DIR__ . '/../logs/ErrorLogger.php';
 
 // Variables
 $resultados = [];

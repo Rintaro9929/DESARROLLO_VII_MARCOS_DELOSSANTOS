@@ -6,7 +6,7 @@ require_once __DIR__ . '/../app/utils/Utilidades.php';
 require_once __DIR__ . '/../app/utils/Navegacion.php';
 
 // Presupuesto total
-$presupuesto = 100000;
+$presupuesto = 200000;
 
 // Distribuir presupuesto
 $areas = Utilidades::distribuirPresupuesto($presupuesto);
